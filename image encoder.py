@@ -86,11 +86,12 @@ def encrypt_image(input_name, output_name, circuit):
     im.show()
     img = Image.new(im.mode, im.size)
     new_pixels = img.load()
+
     for i in range(img.size[0]):
         for j in range(img.size[1]):
             meas1, meas2, meas3 = true_random(circuit), true_random(circuit), true_random(circuit)
-            new_pixels[i, j] = bitwise_xor(old_pixels[i, j], (meas1[0], meas2[0], meas3[0]))
-            key.append((meas1[1], meas2[1], meas3[1]))
+            new_pixels[i, j] = bitwise_xor(old_pixels[i, j], (meas1[1], meas2[1], meas3[1]))
+            key.append((meas1[0], meas2[0], meas3[0]))
     img.save(output_name)
     img.show()
     return img, key
@@ -114,7 +115,7 @@ def decrypt_image(input_image, output_name, key):
 
 # -------------- creation of the quantum circuits that will give us the entangled random numbers --------------
 
-q_circuits = [create_bell_state_circuit(), create_not_entangled_circuit(), create_half_entangled_circuit()]
+q_circuits = [create_not_entangled_circuit(), create_half_entangled_circuit(), create_bell_state_circuit()]
 
 # --------------------- time tests for creation of random numbers using the quantum circuit above ---------------------
 
@@ -130,6 +131,7 @@ for i in range(3):
     print("----> total computation time:", ending_time - starting_time, "\n")
 """
 # --------------------- Encryption and Decryption for each quantum circuit ---------------------
+# it takes time to generate many qubits from IBM's computer. We suggest to start with Black & White images.
 
 for q_circuit in q_circuits:
     # --------------------- Encryption ---------------------
@@ -141,7 +143,7 @@ for q_circuit in q_circuits:
           "\n----> Total encryption time:", ending_time - starting_time, "\n")
 
     # --------------------- Decryption ---------------------
-
+    print(bob_key)
     starting_time = datetime.now()
     decoded_img = decrypt_image(encoded_img, DECRYPTNAME, bob_key)
     ending_time = datetime.now()
